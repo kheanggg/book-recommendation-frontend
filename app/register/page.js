@@ -1,6 +1,7 @@
 'use client';
 
-import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { useState, useEffect } from 'react';
 import AuthCard from '@/components/AuthCard';
 
 export default function RegisterPage() {
@@ -13,11 +14,23 @@ export default function RegisterPage() {
     password_confirmation: '',
   })
 
+  // Initialize router
+  const router = useRouter();
+
   // State to manage errors
   const [errors, setErrors] = useState({});
 
   // State to manage success or error messages
   const [message, setMessage] = useState(null);
+
+  // Protect route if logged in
+  useEffect(() => {
+    const token = localStorage.getItem('authToken');
+    if (token) {
+      router.push('/home'); // or wherever they should go
+      return;
+    }
+  }, []);
 
   // Handle input changes
   const handleChange = (e) => {
@@ -33,7 +46,7 @@ export default function RegisterPage() {
 
     try {
       // Make API call to register user
-      const res = await fetch('http://0.0.0:8000/api/register', {
+      const res = await fetch('http://localhost:8000/api/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
         body: JSON.stringify(formData),
@@ -48,7 +61,7 @@ export default function RegisterPage() {
         if (res.status === 500) {
           throw new Error(data.message || 'Internel server error');
         }
-
+        
         // If there are validation errors, set them in state
         if (data.errors) {
           setErrors(data.errors);
@@ -60,6 +73,10 @@ export default function RegisterPage() {
 
       setMessage('Registration successful!');
 
+      // Save resend and verify URL into sessionStorage
+      sessionStorage.setItem('resendUrl', data.signed_resend_url);
+      sessionStorage.setItem('verifyUrl', data.signed_verify_url);
+
       // Reset form data after successful registration
       setFormData({
         name: '',
@@ -67,6 +84,8 @@ export default function RegisterPage() {
         password: '',
         password_confirmation: '',
       });
+
+      router.push(`/verify?email=${encodeURIComponent(formData.email)}`);
 
     } catch (err) {
 
