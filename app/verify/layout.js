@@ -1,13 +1,13 @@
 import '../globals.css';
 
 export const metadata = {
-  title: 'Register | Book Recommendation',
+  title: 'Verify Code | Book Recommendation',
 };
 
 export default function RootLayout({ children }) {
   return (
     <>
-      {children}
+        {children}
     </>
   );
 }

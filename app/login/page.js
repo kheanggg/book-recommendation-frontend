@@ -23,6 +23,15 @@ export default function LoginPage() {
     setErrors({ ...errors, [e.target.name]: null });
   };
 
+  // Protect route if logged in
+    useEffect(() => {
+      const token = localStorage.getItem('authToken');
+      if (token) {
+        router.push('/home'); // or wherever they should go
+        return;
+      }
+    }, []);
+
   // Function to handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -31,7 +40,7 @@ export default function LoginPage() {
 
     try {
       // Make API call to login user
-      const res = await fetch('http://0.0.0.0:8000/api/login', {
+      const res = await fetch('http://localhost:8000/api/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
         body: JSON.stringify(formData),
