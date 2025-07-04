@@ -1,8 +1,10 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import AuthCard from '@/components/AuthCard';
+import useAuthRedirect from "@/lib/useAuthRedirect";
+import Loader from "@/components/Loader";
 
 export default function RegisterPage() {
 
@@ -17,20 +19,19 @@ export default function RegisterPage() {
   // Initialize router
   const router = useRouter();
 
+  const checking = useAuthRedirect({
+    shouldBeAuthed: false,
+    redirectTo: "/home",
+  });
+
   // State to manage errors
   const [errors, setErrors] = useState({});
 
   // State to manage success or error messages
   const [message, setMessage] = useState(null);
 
-  // Protect route if logged in
-  useEffect(() => {
-    const token = localStorage.getItem('authToken');
-    if (token) {
-      router.push('/home'); // or wherever they should go
-      return;
-    }
-  }, []);
+  const [loading, setLoading] = useState(false);
+
 
   // Handle input changes
   const handleChange = (e) => {
@@ -43,6 +44,7 @@ export default function RegisterPage() {
     e.preventDefault();
     setMessage(null);
     setErrors({});
+    setLoading(true);
 
     try {
       // Make API call to register user
@@ -91,8 +93,12 @@ export default function RegisterPage() {
 
       // Set the error message to be displayed
       setMessage(err.message);
+    } finally {
+      setLoading(false); // End loading
     }
-  }
+  };
+
+  if (loading) return <Loader />;
 
   return (
   <AuthCard title="Register">
@@ -171,6 +177,7 @@ export default function RegisterPage() {
       <button
         type="submit"
         className={`py-2 rounded text-white bg-yellow-400 hover:bg-yellow-300`}
+        disabled={loading}
       >
         Register
       </button>
