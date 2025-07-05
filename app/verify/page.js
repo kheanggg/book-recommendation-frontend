@@ -111,7 +111,7 @@ export default function VerifyPage() {
       }
 
       setMessage('Email verified successfully!');
-      setTimeout(() => router.push('/home'), 1500);
+      setTimeout(() => router.push('/choose-preferences'), 1500);
 
     } catch (err) {
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import AuthCard from "@/components/AuthCard";
 import { useRouter } from "next/navigation";
 import useAuthRedirect from "@/lib/useAuthRedirect";
@@ -27,6 +27,14 @@ export default function LoginPage() {
     shouldBeAuthed: false,
     redirectTo: "/home",
   });
+
+  useEffect(() => {
+    const token = localStorage.getItem('authToken');
+    if (token) {
+      router.push('/home'); // or wherever they should go
+      return;
+    }
+  }, []);
 
   // Handle input changes
   const handleChange = (e) => {

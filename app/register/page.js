@@ -1,7 +1,7 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import AuthCard from '@/components/AuthCard';
 import useAuthRedirect from "@/lib/useAuthRedirect";
 import Loader from "@/components/Loader";
@@ -32,6 +32,13 @@ export default function RegisterPage() {
 
   const [loading, setLoading] = useState(false);
 
+   useEffect(() => {
+      const token = localStorage.getItem('authToken');
+      if (token) {
+        router.push('/home'); // or wherever they should go
+        return;
+      }
+    }, []);
 
   // Handle input changes
   const handleChange = (e) => {
