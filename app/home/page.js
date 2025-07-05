@@ -1,59 +1,21 @@
 'use client';
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import BookList from "@/components/BookList";
-import SearchBooks from '@/components/SearchBooks';
+import RecommendedBooks from "@/components/RecommendedBooks";
+import SearchBooks from "@/components/SearchBooks";
+import Loader from "@/components/Loader"; // Create this component (see below)
 
 export default function HomePage() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [message, setMessage] = useState(null);
-  const router = useRouter();
+  const [loadingCount, setLoadingCount] = useState(2); // 2 components to wait for
 
-  useEffect(() => {
-    const token = localStorage.getItem("authToken");
-    setIsLoggedIn(!!token);
-  }, []);
-
-  const handleLogout = async () => {
-    const token = localStorage.getItem("authToken");
-    let logoutMessage = "Logged out successfully";
-
-    if (token) {
-      try {
-        const res = await fetch("http://localhost:8000/api/logout", {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-            Accept: "application/json",
-          },
-        });
-
-        const data = await res.json();
-        if (!res.ok) {
-          setMessage(data.message || "Logout failed.");
-          return;
-        }
-        if (data.message) logoutMessage = data.message;
-      } catch (error) {
-        setMessage("Logout API error: " + error.message);
-        return;
-      }
-    }
-
-    localStorage.removeItem("authToken");
-    setIsLoggedIn(false);
-    setMessage(logoutMessage);
-
-    setTimeout(() => {
-      router.push("/home");
-    }, 2000);
+  const handleComponentLoaded = () => {
+    setLoadingCount((prev) => prev - 1);
   };
 
   return (
     <div className="p-4">
-      <SearchBooks />
+          <RecommendedBooks/>
+          <SearchBooks  />
     </div>
   );
 }
